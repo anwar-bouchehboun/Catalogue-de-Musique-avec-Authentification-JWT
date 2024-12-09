@@ -1,4 +1,12 @@
 package com.catalogue.musique.dto.request;
 
-public class UserRequest {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserRequest
+{
 }
