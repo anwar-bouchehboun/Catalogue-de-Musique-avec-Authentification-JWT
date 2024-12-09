@@ -1,29 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_PATH" value="logs"/>
-    <property name="LOG_ARCHIVE" value="${LOG_PATH}/archive"/>
+    <!-- Variables communes -->
+    <property name="LOGS_PATH" value="logs"/>
+    <property name="PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
 
     <!-- Console Appender -->
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${PATTERN}</pattern>
         </encoder>
     </appender>
 
-    <!-- File Appender -->
-    <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/application.log</file>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_ARCHIVE}/application.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-    </appender>
+    <!-- Profil DEV -->
+    <springProfile name="dev">
+        <property name="LOG_FILE" value="${LOGS_PATH}/application-dev.log"/>
+        
+        <appender name="DevFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_FILE}</file>
+            <encoder>
+                <pattern>${PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOGS_PATH}/archived/dev/application-%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>30</maxHistory>
+            </rollingPolicy>
+        </appender>
 
-    <root level="INFO">
-        <appender-ref ref="Console"/>
-        <appender-ref ref="File"/>
-    </root>
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="DevFile"/>
+        </root>
+
+        <logger name="com.catalogue.musique" level="INFO"/>
+        <logger name="org.springframework.data.mongodb" level="INFO"/>
+        <logger name="org.springframework.data.mongodb.core.MongoTemplate" level="INFO"/>
+    </springProfile>
+
+    <!-- Profil PROD -->
+    <springProfile name="prod">
+        <property name="LOG_FILE" value="${LOGS_PATH}/application-prod.log"/>
+        
+        <appender name="ProdFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_FILE}</file>
+            <encoder>
+                <pattern>${PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOGS_PATH}/archived/prod/application-%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>60</maxHistory>
+            </rollingPolicy>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="ProdFile"/>
+        </root>
+
+        <logger name="com.catalogue.musique" level="INFO"/>
+        <logger name="org.springframework.data.mongodb" level="INFO"/>
+    </springProfile>
+
 </configuration>
