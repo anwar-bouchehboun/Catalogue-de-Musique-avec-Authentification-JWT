@@ -27,8 +27,7 @@ public class User {
     @NotBlank(message = "Le mot de passe ne peut pas être vide")
     private String password;
 
-    @NotNull(message = "L'état actif ne peut pas être nul")
-    private Boolean active;
+    private Boolean active=true;
 
     @DBRef
     private Collection<Role> roles;
