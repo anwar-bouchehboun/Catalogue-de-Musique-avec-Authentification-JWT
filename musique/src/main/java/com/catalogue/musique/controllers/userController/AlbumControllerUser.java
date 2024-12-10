@@ -1,8 +1,7 @@
-package com.catalogue.musique.controllers.adminController;
+package com.catalogue.musique.controllers.userController;
 
 
 
-import com.catalogue.musique.dto.request.AlbumRequest;
 import com.catalogue.musique.dto.reponse.AlbumResponce;
 import com.catalogue.musique.services.AlbumService;
 import lombok.RequiredArgsConstructor;
@@ -13,23 +12,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/albums")
+@RequestMapping("/api/user/albums")
 @RequiredArgsConstructor
 @Slf4j
-public class AlbumController {
+public class AlbumControllerUser {
 
     private final AlbumService albumService;
 
-    @PostMapping
-    public ResponseEntity<AlbumResponce> createAlbum(@Valid @RequestBody AlbumRequest albumRequest) {
-        log.info("Création d'un nouvel album : {}", albumRequest.getTitre());
-        AlbumResponce createdAlbum = albumService.createAlbum(albumRequest);
-        return new ResponseEntity<>(createdAlbum, HttpStatus.CREATED);
-    }
 
     @GetMapping
     public ResponseEntity<List<AlbumResponce>> getAllAlbums() {
@@ -45,20 +37,6 @@ public class AlbumController {
         return new ResponseEntity<>(album, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<AlbumResponce> updateAlbum(@PathVariable String id,
-                                                   @Valid @RequestBody AlbumRequest albumRequest) {
-        log.info("Mise à jour de l'album avec l'ID : {}", id);
-        AlbumResponce updatedAlbum = albumService.updateAlbum(id, albumRequest);
-        return new ResponseEntity<>(updatedAlbum, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAlbum(@PathVariable String id) {
-        log.info("Suppression de l'album avec l'ID : {}", id);
-        albumService.deleteAlbum(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 
     @GetMapping("/page")
     public ResponseEntity<Page<AlbumResponce>> getAllPagination(Pageable pageable) {

@@ -8,7 +8,10 @@ import com.catalogue.musique.repository.AlbumRepository;
 import com.catalogue.musique.validation.NotFoundExceptionHndler;
 import com.catalogue.musique.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,4 +59,41 @@ public class AlbumService {
         }
         albumRepository.deleteById(id);
     }
+
+
+    public Page<AlbumResponce> getAllPagination(Pageable pageable) {
+        return albumRepository.findAll(pageable)
+                .map(albumMapper::toResponse);
+    }
+
+    @Transactional
+    public Page<AlbumResponce> lister(String titre, Pageable pageable) {
+        if (titre != null && !titre.isEmpty()) {
+            return albumRepository.findByTitre(titre, pageable)
+                    .map(albumMapper::toResponse);
+        }
+        return albumRepository.findAll(pageable)
+                .map(albumMapper::toResponse);
+    }
+
+    @Transactional
+    public Page<AlbumResponce> findByArtiste(String artiste, Pageable pageable) {
+        if (artiste != null && !artiste.isEmpty()) {
+            return albumRepository.findByArtiste(artiste, pageable)
+                    .map(albumMapper::toResponse);
+        }
+        return albumRepository.findAll(pageable)
+                .map(albumMapper::toResponse);
+    }
+
+    @Transactional
+    public Page<AlbumResponce> findByAnnee(Integer annee, Pageable pageable) {
+        if (annee != null) {
+            return albumRepository.findByAnnee(annee, pageable)
+                    .map(albumMapper::toResponse);
+        }
+        return albumRepository.findAll(pageable)
+                .map(albumMapper::toResponse);
+    }
+
 }
