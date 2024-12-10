@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
+@Profile("dev")
 public class DataInitializer {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
@@ -43,10 +45,10 @@ public class DataInitializer {
             // Initialisation des rôles et utilisateurs
             log.info("Création des nouveaux rôles...");
             Role roleAdmin = Role.builder()
-                    .username("ROLE_ADMIN")
+                    .rolename("ROLE_ADMIN")
                     .build();
             Role roleUser = Role.builder()
-                    .username("ROLE_USER")
+                    .rolename("ROLE_USER")
                     .build();
             
             roleRepository.save(roleAdmin);

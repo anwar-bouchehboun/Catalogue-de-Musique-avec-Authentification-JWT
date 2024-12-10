@@ -1,7 +1,7 @@
 package com.catalogue.musique.mapper;
 
 import com.catalogue.musique.dto.request.UserRequest;
-import com.catalogue.musique.dto.response.UserResponse;
+import com.catalogue.musique.dto.reponse.UserResponse;
 import com.catalogue.musique.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
