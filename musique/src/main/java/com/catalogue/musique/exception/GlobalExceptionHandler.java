@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(NotFoundExceptionHndler.class)
     public ResponseEntity<Map<String, String>> handleNotFoundException(NotFoundExceptionHndler ex) {
-        log.error("Element  non trouvé: {}", ex.getMessage());
+        log.error("Element  non trouve: {}", ex.getMessage());
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Element non trouvé");
         errorResponse.put("message", ex.getMessage());
