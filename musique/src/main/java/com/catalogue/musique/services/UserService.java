@@ -29,7 +29,6 @@ public class UserService {
     public UserResponse creerUser(UserRequest request) {
         User user = userMapper.toEntity(request);
         
-        // Gérer les rôles ici
         if (request.getRoleRequests() != null && !request.getRoleRequests().isEmpty()) {
             List<Role> roles = new ArrayList<>();
             for (RoleRequest roleRequest : request.getRoleRequests()) {
@@ -66,7 +65,6 @@ public class UserService {
         user.setLogin(request.getLogin());
         user.setPassword(request.getPassword());
 
-        // Gérer les rôles ici
         if (request.getRoleRequests() != null && !request.getRoleRequests().isEmpty()) {
             List<Role> roles = new ArrayList<>();
             for (RoleRequest roleRequest : request.getRoleRequests()) {
