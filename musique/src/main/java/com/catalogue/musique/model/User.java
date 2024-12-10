@@ -9,8 +9,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Document(collection = "users")
@@ -31,4 +32,6 @@ public class User {
 
     @DBRef
     private Collection<Role> roles;
+
+    
 }
