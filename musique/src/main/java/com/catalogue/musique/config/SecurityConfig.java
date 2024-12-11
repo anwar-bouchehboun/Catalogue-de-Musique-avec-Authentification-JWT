@@ -2,7 +2,6 @@ package com.catalogue.musique.config;
 
 import com.catalogue.musique.filter.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
