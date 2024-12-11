@@ -24,14 +24,22 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Prepare Docker Build') {
             steps {
                 script {
-                    bat 'mkdir target || exit 0'
-                    bat 'copy musique\\target\\*.jar target\\'
-                    
-                    bat "docker build -t ${DOCKER_HUB_REPO}:latest ."
+                    // Créer le Dockerfile s'il n'existe pas
+                    writeFile file: 'Dockerfile', text: '''FROM openjdk:8-jdk-alpine
+WORKDIR /app
+COPY musique/target/*.jar app.jar
+EXPOSE 8086
+ENTRYPOINT ["java", "-jar", "app.jar"]'''
                 }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                bat "docker build -t ${DOCKER_HUB_REPO}:latest ."
             }
         }
 
@@ -50,7 +58,6 @@ pipeline {
     post {
         always {
             bat 'docker logout'
-            bat 'rmdir /s /q target || exit 0'
         }
     }
 }

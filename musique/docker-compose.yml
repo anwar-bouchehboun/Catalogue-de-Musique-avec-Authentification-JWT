@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    image: anwar721/musique:latest
+    ports:
+      - "8080:8086"
+    depends_on:
+      - mongodb
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/musicdb
+      - SPRING_PROFILES_ACTIVE=prod
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    command: ["mongod", "--noauth"]
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: always
+    ports:
+        - "8081:8081"
+    environment:
+        ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
+        ME_CONFIG_BASICAUTH: false
+    depends_on:
+        - mongodb
+
+volumes:
+  mongodb_data:
+    name: mongodb_data
