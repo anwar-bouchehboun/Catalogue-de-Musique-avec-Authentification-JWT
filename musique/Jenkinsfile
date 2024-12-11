@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+
+    tools {
+        maven "Maven"
+    }
+    environment{
+        DOCKER_HUB_REPO = 'anwar721/musique'
+    }
+
+
+    stages {
+        stage('clone repo'){
+            steps{
+                git branch : 'master', url: 'https://github.com/anwar-bouchehboun/Catalogue-de-Musique-avec-Authentification-JWT'
+            }
+        }
+        stage('Build Artifact'){
+            steps{
+                bat '''
+                    cd ./musique
+                    mvn -B -DskipTests clean package 
+                '''
+                archiveArtifacts artifacts: 'musique/target/*.jar', fingerprint: true
+                stash name: 'jar-artifact', includes: 'musique/target/*.jar'
+            }
+        }
+        
+        stage('Docker Build') {
+            steps {
+                unstash 'jar-artifact' 
+                bat 'dir musique\\target'
+                bat "docker build -t ${DOCKER_HUB_REPO}:latest ."
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-token', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        bat 'echo %DOCKER_PASSWORD%| docker login -u %DOCKER_USERNAME% --password-stdin'
+                    }
+                    
+                    bat "docker push ${DOCKER_HUB_REPO}:latest"
+                }
+            }
+        }
+    }
+}
