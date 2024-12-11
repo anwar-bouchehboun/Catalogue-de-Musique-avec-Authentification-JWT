@@ -1,8 +1,8 @@
-FROM openjdk:17-jdk-slim
+FROM openjdk:8-jdk-alpine
 
 WORKDIR /app
 
-COPY musique/target/*.jar app.jar
+COPY target/*.jar app.jar
 
 EXPOSE 8080
 

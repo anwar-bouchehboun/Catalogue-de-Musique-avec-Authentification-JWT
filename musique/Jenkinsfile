@@ -4,46 +4,51 @@ pipeline {
     tools {
         maven "Maven"
     }
-    environment{
+    
+    environment {
         DOCKER_HUB_REPO = 'anwar721/musique'
     }
 
-
     stages {
-        stage('clone repo'){
-            steps{
-                git branch : 'master', url: 'https://github.com/anwar-bouchehboun/Catalogue-de-Musique-avec-Authentification-JWT'
+        stage('Clone Repo') {
+            steps {
+                git branch: 'master', url: 'https://github.com/anwar-bouchehboun/Catalogue-de-Musique-avec-Authentification-JWT'
             }
         }
-        stage('Build Artifact'){
-            steps{
+
+        stage('Build Artifact') {
+            steps {
                 bat '''
                     cd ./musique
-                    mvn -B -DskipTests clean package 
+                    mvn clean package -DskipTests
                 '''
                 archiveArtifacts artifacts: 'musique/target/*.jar', fingerprint: true
-                stash name: 'jar-artifact', includes: 'musique/target/*.jar'
             }
         }
-        
+
         stage('Docker Build') {
             steps {
-                unstash 'jar-artifact' 
-                bat 'dir musique\\target'
-                bat "docker build -t ${DOCKER_HUB_REPO}:latest ."
+                dir('musique') {
+                    bat "docker build -t ${DOCKER_HUB_REPO}:latest ."
+                }
             }
         }
 
         stage('Docker Push') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-token', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-token', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                         bat 'echo %DOCKER_PASSWORD%| docker login -u %DOCKER_USERNAME% --password-stdin'
+                        bat "docker push ${DOCKER_HUB_REPO}:latest"
                     }
-                    
-                    bat "docker push ${DOCKER_HUB_REPO}:latest"
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            bat 'docker logout'
         }
     }
 }
