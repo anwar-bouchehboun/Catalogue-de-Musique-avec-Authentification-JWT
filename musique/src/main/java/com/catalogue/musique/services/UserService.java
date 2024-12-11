@@ -9,6 +9,7 @@ import com.catalogue.musique.model.User;
 import com.catalogue.musique.repository.RoleRepository;
 import com.catalogue.musique.repository.UserRepository;
 import com.catalogue.musique.validation.NotFoundExceptionHndler;
+import com.catalogue.musique.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +30,9 @@ public class UserService  {
     private final PasswordEncoder encoder;
 
     public UserResponse creerUser(UserRequest request) {
+        if (userRepository.findByLogin(request.getLogin()).isPresent()) {
+            throw new ValidationException("Le login " + request.getLogin() + " existe déjà");
+        }
         request.setPassword(encoder.encode(request.getPassword()));
         User user = userMapper.toEntity(request);
         
@@ -54,7 +59,9 @@ public class UserService  {
                 .collect(Collectors.toList());
     }
 
-
+    public Optional<User> findByLogin(String login) {
+        return userRepository.findByLogin(login);
+    }
 
 
 
