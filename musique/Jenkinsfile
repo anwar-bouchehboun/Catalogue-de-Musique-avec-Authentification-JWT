@@ -9,7 +9,6 @@ pipeline {
         DOCKER_HUB_REPO = 'anwar721/musique'
     }
 
-
     stages {
         stage('Clone Repo') {
             steps {
@@ -19,21 +18,19 @@ pipeline {
 
         stage('Build Artifact') {
             steps {
-                bat '''
-                    cd ./musique
-                    mvn clean package -DskipTests
-                '''
-                archiveArtifacts artifacts: 'musique/target/*.jar', fingerprint: true
+                dir('musique') {
+                    bat 'mvn clean package -DskipTests'
+                }
             }
         }
 
         stage('Docker Build') {
             steps {
                 script {
-                    bat '''
-                        cd musique
-                        docker build -t %DOCKER_HUB_REPO%:latest .
-                    '''
+                    bat 'mkdir target || exit 0'
+                    bat 'copy musique\\target\\*.jar target\\'
+                    
+                    bat "docker build -t ${DOCKER_HUB_REPO}:latest ."
                 }
             }
         }
@@ -53,6 +50,7 @@ pipeline {
     post {
         always {
             bat 'docker logout'
+            bat 'rmdir /s /q target || exit 0'
         }
     }
 }
