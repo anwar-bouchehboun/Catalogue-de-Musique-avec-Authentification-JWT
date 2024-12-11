@@ -9,6 +9,7 @@ pipeline {
         DOCKER_HUB_REPO = 'anwar721/musique'
     }
 
+
     stages {
         stage('Clone Repo') {
             steps {
@@ -28,8 +29,11 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                dir('musique') {
-                    bat "docker build -t ${DOCKER_HUB_REPO}:latest ."
+                script {
+                    bat '''
+                        cd musique
+                        docker build -t %DOCKER_HUB_REPO%:latest .
+                    '''
                 }
             }
         }
