@@ -89,12 +89,5 @@ public class UserService  {
         return userMapper.toResponse(userRepository.save(user));
     }
 
-   /* @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userDetail = userRepository.findByLogin(username);
 
-        // Converting UserInfo to UserDetails
-        return userDetail.map(UserInfoDetails::new)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-    }*/
 }
