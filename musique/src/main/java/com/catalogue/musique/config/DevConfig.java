@@ -19,8 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@Profile("prod")
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@Profile("dev")
+public class DevConfig extends WebSecurityConfigurerAdapter {
+
 
     private final JwtRequestFilter jwtRequestFilter;
     private final UserDetailsService userDetailsService;
@@ -38,9 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/api/admin/**").hasAuthority("ADMIN")
-                .antMatchers("/api/user/**").hasAuthority("USER")
+                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
@@ -56,4 +55,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
 }
