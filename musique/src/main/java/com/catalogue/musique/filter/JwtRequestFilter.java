@@ -50,6 +50,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (jwtUtil.validateToken(jwt, username)) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
+                        log.info("Authentification réussie pour l'utilisateur : {}", authentication);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.info("Authentification réussie pour l'utilisateur : {}", username);
                 log.info("Rôles de l'utilisateur : {}", userDetails.getAuthorities());
