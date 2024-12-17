@@ -5,6 +5,7 @@ import com.catalogue.musique.dto.reponse.AlbumResponce;
 import com.catalogue.musique.mapper.AlbumMapper;
 import com.catalogue.musique.model.Album;
 import com.catalogue.musique.repository.AlbumRepository;
+import com.catalogue.musique.util.JwtUtil;
 import com.catalogue.musique.validation.NotFoundExceptionHndler;
 import com.catalogue.musique.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class AlbumService {
     
     private final AlbumRepository albumRepository;
+       private final JwtUtil jwtUtil;
     private final AlbumMapper albumMapper=AlbumMapper.INSTANCE;
 
     public AlbumResponce createAlbum(AlbumRequest albumRequest) {
@@ -96,4 +99,23 @@ public class AlbumService {
                 .map(albumMapper::toResponse);
     }
 
+    public List<AlbumResponce> getAllAlbumsForUser(String token) {
+        List<Album> allAlbums = albumRepository.findAll();
+        boolean isUser = jwtUtil.hasRole(token, "USER");
+        
+        if (isUser) {
+            LocalDateTime twoYearsAgo = LocalDateTime.now().minusYears(2);
+            
+            return allAlbums.stream()
+                .filter(album -> album.getAnnee() <= twoYearsAgo.getYear())
+                .map(albumMapper::toResponse)  // Utilisation du mapper injecté
+                .collect(Collectors.toList());
+        }
+        
+        return allAlbums.stream()
+            .map(albumMapper::toResponse)      // Utilisation du mapper injecté
+            .collect(Collectors.toList());
+    }
 }
+
+

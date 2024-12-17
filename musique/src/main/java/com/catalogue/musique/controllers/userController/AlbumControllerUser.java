@@ -1,7 +1,5 @@
 package com.catalogue.musique.controllers.userController;
 
-
-
 import com.catalogue.musique.dto.reponse.AlbumResponce;
 import com.catalogue.musique.services.AlbumService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import com.catalogue.musique.validation.UnauthorizedException;
 
 @RestController
 @RequestMapping("/api/user/albums")
@@ -22,7 +22,6 @@ public class AlbumControllerUser {
 
     private final AlbumService albumService;
 
-
     @GetMapping
     public ResponseEntity<List<AlbumResponce>> getAllAlbums() {
         log.info("Récupération de tous les albums");
@@ -30,13 +29,24 @@ public class AlbumControllerUser {
         return new ResponseEntity<>(albums, HttpStatus.OK);
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<List<AlbumResponce>> getAllAlbums(HttpServletRequest request) {
+        log.info("Récupération de tous les albums pour l'utilisateur");
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        String token = authHeader.substring(7);
+        List<AlbumResponce> albums = albumService.getAllAlbumsForUser(token);
+        return new ResponseEntity<>(albums, HttpStatus.OK);
+    }
+    throw new UnauthorizedException("Token d'authentification manquant");
+}
+
     @GetMapping("/{id}")
     public ResponseEntity<AlbumResponce> getAlbumById(@PathVariable String id) {
         log.info("Récupération de l'album avec l'ID : {}", id);
         AlbumResponce album = albumService.getAlbumById(id);
         return new ResponseEntity<>(album, HttpStatus.OK);
     }
-
 
     @GetMapping("/page")
     public ResponseEntity<Page<AlbumResponce>> getAllPagination(Pageable pageable) {
