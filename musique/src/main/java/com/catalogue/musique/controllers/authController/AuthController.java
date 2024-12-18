@@ -5,6 +5,8 @@ import com.catalogue.musique.dto.reponse.UserResponse;
 import com.catalogue.musique.dto.request.AuthRequest;
 import com.catalogue.musique.dto.request.UserRequest;
 import com.catalogue.musique.model.User;
+import com.catalogue.musique.security.TokenBlacklist;
+import com.catalogue.musique.services.TokenBlacklistService;
 import com.catalogue.musique.services.UserService;
 import com.catalogue.musique.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import java.util.HashMap;
@@ -38,6 +41,8 @@ public class AuthController {
     private final JwtUtil jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
+        private final TokenBlacklistService tokenBlacklist;
+
 
     @PostMapping
     public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRequest request) {
@@ -87,5 +92,17 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            tokenBlacklist.addToBlacklist(token);
+            return ResponseEntity.ok("Déconnexion réussie");
+        }
+        
+        return ResponseEntity.badRequest().body("Token non fourni");
+    }
 
 }

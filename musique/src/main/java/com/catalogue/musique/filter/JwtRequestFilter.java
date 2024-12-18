@@ -1,5 +1,7 @@
 package com.catalogue.musique.filter;
 
+import com.catalogue.musique.security.TokenBlacklist;
+import com.catalogue.musique.services.TokenBlacklistService;
 import com.catalogue.musique.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +25,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklist;
 
     @Autowired
-    public JwtRequestFilter(JwtUtil jwtUtil, @Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
+    public JwtRequestFilter(JwtUtil jwtUtil, @Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService, TokenBlacklistService tokenBlacklist) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.tokenBlacklist = tokenBlacklist;
     }
 
     @Override
@@ -43,6 +47,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             username = jwtUtil.extractSubject(jwt);
+            if (tokenBlacklist.isTokenBlacklisted(jwt)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -58,6 +66,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 log.warn("Token JWT invalide pour l'utilisateur : {}", username);
             }
         }
+
+
         chain.doFilter(request, response);
     }
 }
