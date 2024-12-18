@@ -20,12 +20,13 @@ public class JwtUtil {
     
     public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
     private final long expirationTime = 1000 * 60 * 60; // 1 heure
-  //  private static final String ISSUER = "catalogue-musique-api"; // Ajout de la constante
+   private static final String ISSUER = "catalogue-musique-api"; //
 
     public String generateToken(String username, List<String> roles) {
         return Jwts.builder()
                 .setSubject(username)
-           
+               // s.claim("role",roles)
+            //    .setIssuer(ISSUER)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
